@@ -1,0 +1,27 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Alertmanager configuration may contain a Slack webhook
+alertmanager/alertmanager.yml
+
+# Generated monitoring data
+prometheus/data/
+alertmanager/data/
+grafana/data/
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Additional secret files and local databases
+alertmanager/slack_webhook_url
+*.db
+*.sqlite
+*.sqlite3

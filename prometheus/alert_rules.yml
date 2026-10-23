@@ -1,0 +1,32 @@
+groups:
+  - name: ec2-node-alerts
+    rules:
+      - alert: InstanceDown
+        expr: up{job='node_exporter'} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Instance {{ $labels.name }} is down'
+          description: '{{ $labels.name }} ({{ $labels.instance }}) has been unreachable for more than 1 minute.'
+
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance, name) (rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High CPU usage on {{ $labels.name }}'
+          description: 'CPU usage on {{ $labels.name }} ({{ $labels.instance }}) has been above 80% for 5 minutes. Current value: {{ $value | humanize }}%.'
+
+      - alert: HighDiskUsage
+        expr: |
+          (1 - (node_filesystem_avail_bytes{fstype!~'tmpfs|overlay|squashfs|ramfs|vfat'}
+                / node_filesystem_size_bytes{fstype!~'tmpfs|overlay|squashfs|ramfs|vfat'})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High disk usage on {{ $labels.name }}'
+          description: 'Filesystem {{ $labels.mountpoint }} on {{ $labels.name }} ({{ $labels.instance }}) is more than 85% full. Current value: {{ $value | humanize }}%.'
